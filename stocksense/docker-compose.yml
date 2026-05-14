@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  # ── FastAPI Backend ──
+  api:
+    build: .
+    container_name: stocksense-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ── Redis (session state + Celery broker) ──
+  redis:
+    image: redis:7-alpine
+    container_name: stocksense-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # ── Celery Worker (async forecasts & reminders) ──
+  worker:
+    build: .
+    container_name: stocksense-worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: celery -A app.celery_app worker --loglevel=info
+
+  # ── Celery Beat (scheduled jobs: Monday forecast, 9 PM reminder) ──
+  beat:
+    build: .
+    container_name: stocksense-beat
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: celery -A app.celery_app beat --loglevel=info
+
+volumes:
+  redis_data:
