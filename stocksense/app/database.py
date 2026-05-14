@@ -1,0 +1,28 @@
+"""
+Database connection and session management.
+Uses SQLAlchemy async engine pointed at Supabase PostgreSQL.
+"""
+
+import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost:5432/stocksense")
+
+engine = create_engine(DATABASE_URL, echo=True)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+def get_db():
+    """FastAPI dependency — yields a DB session, auto-closes on completion."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
