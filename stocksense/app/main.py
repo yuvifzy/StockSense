@@ -38,3 +38,4 @@ async def health_check():
     """Returns service health and database connectivity status."""
     # TODO: Add real DB ping once Supabase is connected
     return {"status": "ok", "db": "connected"}
+# StockSense API endpoints — authored by @sazgaming2312-ui
