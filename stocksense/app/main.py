@@ -21,16 +21,15 @@ app = FastAPI(
 # ── CORS (allow frontend dev server) ──
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Lock down in production
-    allow_credentials=True,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ── Register route modules ──
 app.include_router(whatsapp.router, prefix="/webhook", tags=["WhatsApp"])
-app.include_router(forecast.router, prefix="/forecast", tags=["Forecast"])
-app.include_router(inventory.router, prefix="/inventory", tags=["Inventory"])
+app.include_router(forecast.router, tags=["Forecast"])
+app.include_router(inventory.router, tags=["Inventory"])
 
 
 # ── Health check ──

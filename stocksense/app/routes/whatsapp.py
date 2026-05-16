@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
 from app.models.store import Store
+from app.models.message_log import MessageLog
 from app.services.conversation import (
     ConversationState,
     get_state,
@@ -72,6 +73,17 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
         return {"status": "ignored"}
 
     logger.info("Received from %s: %s", phone, message_text[:100])
+
+    # Log incoming message
+    store = db.query(Store).filter(Store.whatsapp_number == phone).first()
+    if store:
+        msg_log = MessageLog(
+            store_id=store.id,
+            text=message_text,
+            direction="inbound",
+        )
+        db.add(msg_log)
+        db.commit()
 
     # ── Get current conversation state ──
     state = await get_state(phone)
@@ -272,7 +284,7 @@ async def _handle_confirmation(phone: str, text: str, db: Session) -> None:
         # ── TASK 4: Persist confirmed sales ──
         pending = await get_pending_items(phone)
         if pending and store:
-            persist_sales(db, store.store_id, pending, source="text")
+            persist_sales(db, store.id, pending, source="text")
             await send_text(phone, get_message("sales_saved", lang))
         else:
             await send_text(phone, get_message("parse_error", lang))
@@ -391,3 +403,31 @@ async def _switch_language(phone: str, text: str, db: Session) -> None:
         "en": "Language set to English. ✅",
     }
     await send_text(phone, confirmations[new_lang])
+
+
+@router.get("/api/messages")
+def get_messages(
+    store_id: int = Query(..., description="ID of the store"),
+    limit: int = Query(20, description="Number of messages to return"),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns last N WhatsApp messages for this store.
+    """
+    messages = (
+        db.query(MessageLog)
+        .filter(MessageLog.store_id == store_id)
+        .order_by(MessageLog.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    
+    return [
+        {
+            "id": m.id,
+            "from": "system" if m.direction == "outbound" else "owner",
+            "text": m.text,
+            "time": m.created_at,
+        }
+        for m in messages
+    ]
