@@ -20,8 +20,11 @@ httpx==0.27.0
 # AI / NLP
 google-genai>=0.8.0
 
-# Forecasting (structure only — not wired yet)
-prophet==1.1.5
+# Forecasting
+neuralprophet>=0.8.0
+holidays>=0.40
+pandas>=1.5.0
+numpy>=1.24.0,<2.0.0
 
 # Utilities
 python-dotenv==1.0.1

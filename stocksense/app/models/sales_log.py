@@ -7,7 +7,7 @@ import uuid
 from datetime import date as date_type
 
 from sqlalchemy import Column, Integer, Date, String, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+
 
 from app.database import Base
 
@@ -15,14 +15,14 @@ from app.database import Base
 class SalesLog(Base):
     __tablename__ = "sales_logs"
 
-    log_id = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
+    id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True
     )
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False, index=True
+        Integer, ForeignKey("stores.id"), nullable=False, index=True
     )
     sku_id = Column(
-        UUID(as_uuid=True), ForeignKey("skus.sku_id"), nullable=False, index=True
+        Integer, ForeignKey("skus.id"), nullable=False, index=True
     )
     quantity_sold = Column(Integer, nullable=False)
     date = Column(Date, default=date_type.today, nullable=False)
