@@ -126,6 +126,7 @@ const CSS = `
 @keyframes ss-toggleBg{ from{opacity:0} to{opacity:1} }
 @keyframes ss-iconPop { 0%{transform:scale(.5) rotate(-30deg);opacity:0} 60%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0deg);opacity:1} }
 @keyframes ss-skeleton { 0%,100%{opacity:.45} 50%{opacity:.85} }
+@keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
 
 .anim-fadeUp { animation:ss-fadeUp .48s cubic-bezier(.22,1,.36,1) both; }
 .anim-fadeIn { animation:ss-fadeIn .3s ease both; }
@@ -417,7 +418,7 @@ function ChartTip({ active, payload, label, dark }) {
 
 function ReorderTable({ rows, onOrder, dark, loading }) {
   if (loading) {
-    return <div className="card skeleton" style={{ height: 376 }} />;
+    return <div className="card skeleton" style={{ height: 376, animation: "pulse 1.5s ease-in-out infinite" }} />;
   }
   return (
     <div className="card anim-fadeUp d-5">
@@ -470,7 +471,7 @@ function ReorderTable({ rows, onOrder, dark, loading }) {
 
 function SKUChart({ dark, chartData, seriesLabels, loading }) {
   if (loading) {
-    return <div className="card skeleton" style={{ height: 326 }} />;
+    return <div className="card skeleton" style={{ height: 326, animation: "pulse 1.5s ease-in-out infinite" }} />;
   }
   const tip = (props) => <ChartTip {...props} dark={dark} />;
   return (
@@ -507,7 +508,7 @@ function WhatsAppFeed({ dark, messages, loading }) {
   useEffect(() => { setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 120); }, [messages]);
 
   if (loading) {
-    return <div className="card skeleton" style={{ height: "calc(100vh - 196px)", minHeight: 520 }} />;
+    return <div className="card skeleton" style={{ height: "calc(100vh - 196px)", minHeight: 520, animation: "pulse 1.5s ease-in-out infinite" }} />;
   }
 
   return (
@@ -626,8 +627,8 @@ function InventoryTable({ dark, items, categories, loading }) {
   if (loading) {
     return (
       <div className="anim-fadeIn" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="card skeleton" style={{ height: 110 }} />
-        <div className="card skeleton" style={{ height: 360 }} />
+        <div className="card skeleton" style={{ height: 110, animation: "pulse 1.5s ease-in-out infinite" }} />
+        <div className="card skeleton" style={{ height: 360, animation: "pulse 1.5s ease-in-out infinite" }} />
       </div>
     );
   }
@@ -973,7 +974,7 @@ export default function StockSense() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 14 }}>
               {loading ? (
                 [0, 1, 2, 3].map((i) => (
-                  <div key={i} className="card skeleton" style={{ height: 92 }} />
+                  <div key={i} className="card skeleton" style={{ height: 92, animation: "pulse 1.5s ease-in-out infinite" }} />
                 ))
               ) : (
                 <>
