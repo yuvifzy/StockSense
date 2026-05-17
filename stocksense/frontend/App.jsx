@@ -743,6 +743,8 @@ export default function StockSense() {
       const firstError = [s, st, f, inv, msg].find(r => r.error);
       setError(firstError ? "Could not connect to server. Is the backend running?" : null);
       setStores(s.data || []);
+      const firstStoreName = (s.data || [])[0]?.name || "Loading";
+      document.title = `StockSense — ${firstStoreName}`;
       setStats(st.data || {});
       setForecast(f.data || []);
       setInventory(inv.data || []);
