@@ -192,10 +192,7 @@ def seeded_db(db_session, test_store_id, test_sku_ids):
 # ── Tests ──
 
 def test_generate_forecast_returns_result(seeded_db, test_store_id, test_sku_ids):
-    """
-    Test that generate_forecast returns a non-null result for each SKU
-    with 30 days of consistent data.
-    """
+    """Ensure generate_forecast returns a result for each seeded SKU."""
     for sku_id in test_sku_ids:
         result = generate_forecast(seeded_db, test_store_id, sku_id)
 
@@ -211,9 +208,7 @@ def test_generate_forecast_returns_result(seeded_db, test_store_id, test_sku_ids
 
 
 def test_forecast_confidence_is_high(seeded_db, test_store_id, test_sku_ids):
-    """
-    With 30 days of consistent, low-variance data, confidence should be High.
-    """
+    """Verify confidence is High for stable 30-day sales data."""
     for sku_id in test_sku_ids:
         result = generate_forecast(seeded_db, test_store_id, sku_id)
         assert result is not None
@@ -224,9 +219,7 @@ def test_forecast_confidence_is_high(seeded_db, test_store_id, test_sku_ids):
 
 
 def test_reorder_qty_is_ceil_1_2x(seeded_db, test_store_id, test_sku_ids):
-    """
-    Assert reorder_qty == ceil(predicted_qty × 1.2) per PRD P0.4.
-    """
+    """Assert reorder_qty equals ceil(predicted_qty × 1.2)."""
     for sku_id in test_sku_ids:
         result = generate_forecast(seeded_db, test_store_id, sku_id)
         assert result is not None
@@ -238,9 +231,7 @@ def test_reorder_qty_is_ceil_1_2x(seeded_db, test_store_id, test_sku_ids):
 
 
 def test_generate_all_forecasts(seeded_db, test_store_id):
-    """
-    Test that generate_all_forecasts returns results for all 3 SKUs.
-    """
+    """Confirm generate_all_forecasts returns results for each SKU."""
     results = generate_all_forecasts(seeded_db, test_store_id)
     assert len(results) == 3
     # Should be sorted by reorder_qty descending
@@ -249,9 +240,7 @@ def test_generate_all_forecasts(seeded_db, test_store_id):
 
 
 def test_insufficient_data_returns_none(seeded_db, test_store_id):
-    """
-    A brand-new SKU with 0 sales should return None.
-    """
+    """Confirm an SKU with no sales returns None."""
     new_sku = TestSKU(
         store_id=test_store_id,
         canonical_name="new product with no sales",
@@ -266,9 +255,7 @@ def test_insufficient_data_returns_none(seeded_db, test_store_id):
 
 
 def test_deadstock_detection(seeded_db, test_store_id):
-    """
-    The 'new product with no sales' SKU should appear in deadstock.
-    """
+    """Ensure deadstock list includes the no-sales SKU."""
     deadstock = get_deadstock_skus(seeded_db, test_store_id)
     names = [d["sku_name"] for d in deadstock]
     assert "new product with no sales" in names
