@@ -869,8 +869,27 @@ export default function StockSense() {
           borderRadius: 12,
           fontSize: 13,
           fontWeight: 700,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"space-between",
+          gap:12,
         }}>
-          {error}
+          <span>{error}</span>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background:"#991B1B",
+              color:"#fff",
+              border:"none",
+              borderRadius:10,
+              padding:"6px 12px",
+              cursor:"pointer",
+              fontSize:12,
+              fontWeight:700,
+            }}
+          >
+            Retry
+          </button>
         </div>
       )}
 
