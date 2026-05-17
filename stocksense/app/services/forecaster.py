@@ -69,6 +69,15 @@ def _fetch_daily_sales(
     return df
 
 
+def _calculate_confidence(mae_pct: float, days_of_data: int) -> str:
+    """Convert MAE percentage and data length into a confidence label."""
+    if days_of_data >= MIN_DAYS_FOR_HIGH_CONFIDENCE and mae_pct < 0.25:
+        return "High"
+    if days_of_data >= MIN_DAYS_FOR_FORECAST and mae_pct < 0.45:
+        return "Medium"
+    return "Low"
+
+
 
 def generate_forecast(
     db: Session,
@@ -126,12 +135,7 @@ def generate_forecast(
     mae_pct = last_mae / mean_actual if mean_actual > 0 else 1.0
 
     days_of_data = len(df)
-    if days_of_data >= 21 and mae_pct < 0.25:
-        confidence = "High"
-    elif days_of_data >= 14 and mae_pct < 0.45:
-        confidence = "Medium"
-    else:
-        confidence = "Low"
+    confidence = _calculate_confidence(mae_pct, days_of_data)
 
     # Generate future predictions
     future = model.make_future_dataframe(df=df, periods=horizon_days)
