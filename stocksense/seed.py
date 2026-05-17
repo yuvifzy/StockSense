@@ -61,6 +61,10 @@ def main() -> None:
         print(
             f"Seeded store id={store.id} with 5 SKUs and 30 days of sales"
         )
+        print("\nSeed summary")
+        print(f"{'Stores':<14}1")
+        print(f"{'SKUs':<14}{len(skus)}")
+        print(f"{'Sales logs':<14}{len(skus) * 30}")
     finally:
         db.close()
 
