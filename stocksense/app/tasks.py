@@ -48,6 +48,8 @@ celery_app.conf.timezone = "Asia/Kolkata"
 celery_app.conf.enable_utc = True
 
 # ── Beat schedule (cron jobs) ──
+# Weekly forecast runs Monday 8:00 AM IST.
+# Daily reminder runs every day at 9:00 PM IST.
 celery_app.conf.beat_schedule = {
     "weekly-forecast-monday-8am": {
         "task": "app.tasks.send_weekly_forecast",
