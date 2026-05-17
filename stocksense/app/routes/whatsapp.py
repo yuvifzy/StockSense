@@ -66,6 +66,7 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
     Routes the message through the onboarding state machine.
     """
     body = await request.json()
+    logger.info("Inbound webhook received")
 
     # ── Extract message data from Meta webhook payload ──
     phone, message_text = _extract_message(body)
