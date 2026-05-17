@@ -1,3 +1,4 @@
+from typing import Optional
 """
 Sales persistence service — TASK 4
 Handles writing confirmed sales to the database.
@@ -20,7 +21,7 @@ def get_or_create_sku(
     db: Session,
     store_id: uuid.UUID,
     sku_name: str,
-    unit: str | None = None,
+    unit: Optional[str] = None,
 ) -> SKU:
     """
     Find an existing SKU by canonical_name for this store, or create one.
