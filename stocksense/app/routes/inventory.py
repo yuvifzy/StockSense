@@ -37,6 +37,8 @@ def get_inventory(
       - avg_daily_sales (last 30 days)
       - days_remaining (current_stock / avg_daily_sales)
     """
+    if store_id <= 0:
+        raise HTTPException(status_code=400, detail="Invalid store_id")
     skus = db.query(SKU).filter(SKU.store_id == store_id).all()
     if not skus:
         return []
@@ -118,6 +120,8 @@ def get_stats(
     savings_inr formula:
       deadstock_items_avoided × 150 + stockouts_prevented × avg_daily_sale × 2
     """
+        if store_id <= 0:
+                raise HTTPException(status_code=400, detail="Invalid store_id")
     # Get deadstock count
     deadstock = get_deadstock_skus(db, store_id)
     deadstock_count = len(deadstock)
