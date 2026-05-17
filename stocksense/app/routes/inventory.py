@@ -79,6 +79,7 @@ def get_forecast(store_id: int = Query(...), week: str = None):
             stock = 0
             status = "Order now" if stock <= 5 else "Order soon" if stock <= 10 else "Sufficient"
             result.append({"sku_name": sku.canonical_name, "predicted_qty": predicted, "reorder_qty": reorder, "confidence": "High", "status": status, "stock": stock, "supplier": "Distributor"})
+        result.sort(key=lambda x: x["reorder_qty"], reverse=True)
         return result
     finally:
         db.close()
