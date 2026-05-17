@@ -314,6 +314,15 @@ function inventoryStatus(stock, avgDaily) {
   return "Good";
 }
 
+function normalizeInventoryStatus(status) {
+  if (!status) return null;
+  const value = String(status).toLowerCase();
+  if (value.includes("critical")) return "Critical";
+  if (value.includes("low")) return "Low";
+  if (value.includes("good")) return "Good";
+  return null;
+}
+
 // ─── Status Pill ──────────────────────────────────────────────────────────────
 
 function StatusPill({ status, dark }) {
@@ -796,6 +805,7 @@ export default function StockSense() {
     return inventory.map((item, index) => {
       const stock = Number(item.current_stock ?? 0);
       const avgDaily = Number(item.avg_daily_sales ?? 0);
+      const apiStatus = normalizeInventoryStatus(item.status);
       return {
         id: item.sku_id ?? index,
         product: item.sku_name || "Unknown",
@@ -803,7 +813,7 @@ export default function StockSense() {
         unit: item.unit || "units",
         stock,
         avgDaily,
-        status: inventoryStatus(stock, avgDaily),
+        status: apiStatus || inventoryStatus(stock, avgDaily),
       };
     });
   }, [inventory]);
