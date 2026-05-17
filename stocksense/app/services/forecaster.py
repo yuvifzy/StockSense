@@ -1,6 +1,6 @@
 """
 Forecaster Service
-Generates weekly demand forecasts using Facebook Prophet.
+Generates weekly demand forecasts using NeuralProphet.
 
 No AI logic wired yet — this is a structural placeholder.
 """
