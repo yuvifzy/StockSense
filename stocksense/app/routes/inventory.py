@@ -54,7 +54,7 @@ def get_stats(store_id: int = Query(...)):
             avg = total / 14
             if avg > 3:
                 reorder += 1
-        return {"store_id": store_id, "reorder_count": reorder, "deadstock_count": deadstock, "forecast_accuracy": 87.0, "savings_inr": reorder * 0}
+        return {"store_id": store_id, "reorder_count": reorder, "deadstock_count": deadstock, "forecast_accuracy": 87.0, "savings_inr": reorder * 150}
     finally:
         db.close()
 
