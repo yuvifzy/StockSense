@@ -10,6 +10,12 @@ import random
 
 db = SessionLocal()
 
+existing = db.query(Store).filter(Store.name == "Sharma Kirana").first()
+if existing:
+    print("Already seeded")
+    db.close()
+    raise SystemExit(0)
+
 store = Store(name="Sharma Kirana", pin_code="110017", language="hi")
 db.add(store)
 db.commit()
