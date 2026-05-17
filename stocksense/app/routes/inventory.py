@@ -83,3 +83,12 @@ def get_forecast(store_id: int = Query(...), week: str = None):
         return result
     finally:
         db.close()
+
+# Returns health status with store count.
+@router.get("/health")
+def get_health():
+    db = SessionLocal()
+    try:
+        return {"status": "ok", "store_count": db.query(Store).count()}
+    finally:
+        db.close()
