@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 router = APIRouter()
 
+# Returns all registered stores.
 @router.get("/stores")
 def get_stores():
     db = SessionLocal()
@@ -17,6 +18,7 @@ def get_stores():
     finally:
         db.close()
 
+# Returns inventory metrics for all SKUs in a store.
 @router.get("/inventory")
 def get_inventory(store_id: int = Query(...)):
     db = SessionLocal()
@@ -35,6 +37,7 @@ def get_inventory(store_id: int = Query(...)):
     finally:
         db.close()
 
+# Returns summary stats for a store.
 @router.get("/stats")
 def get_stats(store_id: int = Query(...)):
     db = SessionLocal()
@@ -55,10 +58,12 @@ def get_stats(store_id: int = Query(...)):
     finally:
         db.close()
 
+# Returns the most recent WhatsApp messages for a store.
 @router.get("/messages")
 def get_messages(store_id: int = Query(...), limit: int = 20):
     return []
 
+# Returns a simple forecast for a store.
 @router.get("/forecast")
 def get_forecast(store_id: int = Query(...), week: str = None):
     db = SessionLocal()
