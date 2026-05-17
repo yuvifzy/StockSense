@@ -93,6 +93,7 @@ def generate_forecast(
         }
         or None if insufficient data (< 14 days).
     """
+    logger.info("Generating forecast for store=%s sku=%s", store_id, sku_id)
     df = _fetch_daily_sales(db, store_id, sku_id)
 
     # Minimum data check (PRD: "Minimum 2 weeks of input data required")
