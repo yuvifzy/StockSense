@@ -198,7 +198,14 @@ def send_weekly_forecast():
         for store in stores:
             try:
                 # Generate forecasts for all SKUs
-                forecasts = generate_all_forecasts(db, store.id)
+                try:
+                    forecasts = generate_all_forecasts(db, store.id)
+                except Exception as e:
+                    logger.error(
+                        "Forecast generation failed for store %s: %s",
+                        store.name, e, exc_info=True,
+                    )
+                    continue
                 if not forecasts:
                     logger.info(
                         "No forecastable SKUs for store %s", store.name
