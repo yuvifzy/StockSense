@@ -7,6 +7,7 @@ async function apiFetch(path) {
     const data = await res.json();
     return { data, error: null };
   } catch (err) {
+    console.error(`[StockSense API] ${path} failed:`, err.message);
     return { data: null, error: err.message };
   }
 }
