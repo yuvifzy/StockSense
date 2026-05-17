@@ -536,6 +536,11 @@ function WhatsAppFeed({ dark, messages, loading }) {
           transition: "background .35s"
         }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {messages.length === 0 && (
+              <div style={{ textAlign: "center", fontSize: 12.5, fontWeight: 600, color: dark ? "#94A3B8" : "#6B7280", padding: "18px 12px" }}>
+                No messages yet. Send a WhatsApp message to get started.
+              </div>
+            )}
             {messages.map((msg, i) => (
               <div key={msg.id || i} className="anim-msgPop" style={{ display: "flex", justifyContent: msg.from === "owner" ? "flex-end" : "flex-start", animationDelay: `${i * 0.045}s` }}>
                 <div style={{
