@@ -103,10 +103,10 @@ def generate_forecast(
         or None if insufficient data (< 14 days).
     """
     logger.info("Generating forecast for store=%s sku=%s", store_id, sku_id)
-    df = _fetch_daily_sales(db, store_id, sku_id)
+    sales_df = _fetch_daily_sales(db, store_id, sku_id)
 
     # Minimum data check (PRD: "Minimum 2 weeks of input data required")
-    unique_days = df["ds"].nunique() if not df.empty else 0
+    unique_days = sales_df["ds"].nunique() if not sales_df.empty else 0
     if unique_days < MIN_DAYS_FOR_FORECAST:
         logger.info(
             "Insufficient data for forecast: store=%s sku=%s days=%d (need %d)",
@@ -127,18 +127,18 @@ def generate_forecast(
     except Exception as e:
         logger.warning("Could not add Indian holidays: %s", e)
 
-    metrics = model.fit(df)
+    metrics = model.fit(sales_df)
 
     # Calculate confidence based on NeuralProphet metrics
     last_mae = metrics["MAE"].iloc[-1]
-    mean_actual = df["y"].mean()
+    mean_actual = sales_df["y"].mean()
     mae_pct = last_mae / mean_actual if mean_actual > 0 else 1.0
 
-    days_of_data = len(df)
+    days_of_data = len(sales_df)
     confidence = _calculate_confidence(mae_pct, days_of_data)
 
     # Generate future predictions
-    future = model.make_future_dataframe(df=df, periods=horizon_days)
+    future = model.make_future_dataframe(df=sales_df, periods=horizon_days)
     forecast = model.predict(future)
 
     # Sum predicted demand for the next `horizon_days`
