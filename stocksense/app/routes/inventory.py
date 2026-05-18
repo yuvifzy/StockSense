@@ -98,7 +98,7 @@ def get_inventory(
             "total_sold_lifetime": int(total_lifetime),
         })
 
-    # Sort by avg daily sales (highest first)
+    # Sort by avg_daily_sales for prioritization (highest first)
     result.sort(key=lambda x: x["avg_daily_sales"], reverse=True)
     return result
 
