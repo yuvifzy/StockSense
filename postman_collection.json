@@ -1,43 +1,43 @@
 {
-  "info": {
-    "name": "StockSense API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "List stores",
-      "request": {
-        "method": "GET",
-        "url": "http://localhost:8000/api/stores"
-      }
+    "info": {
+        "name": "StockSense API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
-    {
-      "name": "Inventory",
-      "request": {
-        "method": "GET",
-        "url": "http://localhost:8000/api/inventory?store_id=1"
-      }
-    },
-    {
-      "name": "Stats",
-      "request": {
-        "method": "GET",
-        "url": "http://localhost:8000/api/stats?store_id=1"
-      }
-    },
-    {
-      "name": "Forecast",
-      "request": {
-        "method": "GET",
-        "url": "http://localhost:8000/api/forecast?store_id=1"
-      }
-    },
-    {
-      "name": "Messages",
-      "request": {
-        "method": "GET",
-        "url": "http://localhost:8000/api/messages?store_id=1&limit=20"
-      }
-    }
-  ]
+    "item": [
+        {
+            "name": "List stores",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:8000/api/stores"
+            }
+        },
+        {
+            "name": "Inventory",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:8000/api/inventory?store_id=1"
+            }
+        },
+        {
+            "name": "Stats",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:8000/api/stats?store_id=1"
+            }
+        },
+        {
+            "name": "Forecast",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:8000/api/forecast?store_id=1"
+            }
+        },
+        {
+            "name": "Messages",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:8000/api/messages?store_id=1&limit=20"
+            }
+        }
+    ]
 }
