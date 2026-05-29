@@ -6,6 +6,7 @@ No AI logic wired yet — this is a structural placeholder.
 """
 
 from datetime import date
+from typing import List, Dict
 
 
 async def generate_weekly_forecast(store_id: str, week_start: date) -> list[dict]:
@@ -39,3 +40,8 @@ async def get_latest_forecast(store_id: str) -> dict:
     """
     # TODO: Query forecasts table for latest week_start
     return {"store_id": store_id, "forecasts": [], "reorder_suggestions": []}
+
+
+def get_deadstock_skus(db, store_id: int, days: int = 14) -> List[Dict]:
+    """Return an empty deadstock list for the API scaffold."""
+    return []

@@ -5,8 +5,8 @@ Creates SKUs on-the-fly if they don't exist for the store.
 """
 
 import logging
-import uuid
 from datetime import date
+from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 def get_or_create_sku(
     db: Session,
-    store_id: uuid.UUID,
+    store_id: int,
     sku_name: str,
-    unit: str | None = None,
+    unit: Optional[str] = None,
 ) -> SKU:
     """
     Find an existing SKU by canonical_name for this store, or create one.
@@ -63,7 +63,7 @@ def get_or_create_sku(
 
 def persist_sales(
     db: Session,
-    store_id: uuid.UUID,
+    store_id: int,
     parsed_items: list[dict],
     source: str = "text",
 ) -> list[SalesLog]:
@@ -99,7 +99,7 @@ def persist_sales(
         # Create sales log
         log = SalesLog(
             store_id=store_id,
-            sku_id=sku.sku_id,
+            sku_id=sku.id,
             quantity_sold=quantity,
             date=date.today(),
             source=source,
