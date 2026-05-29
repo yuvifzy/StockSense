@@ -85,7 +85,8 @@ def get_inventory(
         # Estimated current stock = 0 (no stock input feature yet)
         # Days remaining is calculated when stock data is available (P1.4)
         current_stock = 0
-        days_remaining = 0 if avg_daily == 0 else round(current_stock / avg_daily, 1)
+        days_remaining = 0 if avg_daily == 0 else round(
+            current_stock / avg_daily, 1)
 
         result.append({
             "sku_id": sku.id,
@@ -120,8 +121,8 @@ def get_stats(
     savings_inr formula:
       deadstock_items_avoided × 150 + stockouts_prevented × avg_daily_sale × 2
     """
-        if store_id <= 0:
-                raise HTTPException(status_code=400, detail="Invalid store_id")
+    if store_id <= 0:
+        raise HTTPException(status_code=400, detail="Invalid store_id")
     # Get deadstock count
     deadstock = get_deadstock_skus(db, store_id)
     deadstock_count = len(deadstock)
