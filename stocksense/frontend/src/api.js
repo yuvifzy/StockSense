@@ -12,6 +12,24 @@ async function apiFetch(path) {
   }
 }
 
+export const fetchStores = () => apiFetch("/api/stores");
+export const fetchForecast = (storeId) => apiFetch(`/api/forecast?store_id=${storeId}`);
+export const fetchInventory = (storeId) => apiFetch(`/api/inventory?store_id=${storeId}`);
+export const fetchStats = (storeId) => apiFetch(`/api/stats?store_id=${storeId}`);
+export const fetchMessages = (storeId) => apiFetch(`/api/messages?store_id=${storeId}&limit=20`);const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+async function apiFetch(path) {
+  try {
+    const res = await fetch(`${BASE_URL}${path}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return { data, error: null };
+  } catch (err) {
+    console.error(`[StockSense API] ${path} failed:`, err.message);
+    return { data: null, error: err.message };
+  }
+}
+
 /**
  * Fetch all registered stores.
  */
