@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # ── Gemini client (lazy-init to avoid crash when API key is empty) ──
 _client = None
-MODEL_NAME = "gemini-1.5-flash"
+MODEL_NAME = "gemini-2.0-flash-lite"
 
 
 def _get_client() -> genai.Client:
@@ -28,6 +28,7 @@ def _get_client() -> genai.Client:
     if _client is None:
         _client = genai.Client(api_key=settings.GEMINI_API_KEY)
     return _client
+
 
 # ── System prompt for structured extraction ──
 EXTRACTION_PROMPT = """You are a sales data extraction assistant for Indian kirana (grocery) stores.
@@ -85,6 +86,18 @@ async def parse_sales_message(
     if not raw_text or not raw_text.strip():
         return []
 
+    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY.strip() == "test-key":
+        logger.warning(
+            "GEMINI_API_KEY is missing or set to 'test-key'; returning mock parsed sales response for local development."
+        )
+        return [{
+            "sku_name": "Test Item",
+            "quantity": 1,
+            "unit": "units",
+            "confidence": 0.9,
+            "needs_confirmation": False,
+        }]
+
     try:
         prompt = (
             f"{EXTRACTION_PROMPT}\n\n"
@@ -109,7 +122,8 @@ async def parse_sales_message(
         parsed_items = json.loads(response_text)
 
         if not isinstance(parsed_items, list):
-            logger.warning("Gemini returned non-list response: %s", response_text)
+            logger.warning(
+                "Gemini returned non-list response: %s", response_text)
             return []
 
         # Normalise each item and flag low-confidence items
