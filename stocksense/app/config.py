@@ -29,6 +29,3 @@ class Settings:
 
 
 settings = Settings()
-
-if not settings.GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is required")
