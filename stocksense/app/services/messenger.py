@@ -13,6 +13,9 @@ from typing import Optional
 import httpx
 
 from app.config import settings
+from app.database import SessionLocal
+from app.models.store import Store
+from app.models.message_log import MessageLog
 
 logger = logging.getLogger(__name__)
 
@@ -171,6 +174,23 @@ async def send_text(to: str, body: str) -> dict:
         "type": "text",
         "text": {"body": body},
     }
+
+    # Log to DB
+    db = SessionLocal()
+    try:
+        store = db.query(Store).filter(Store.whatsapp_number == to).first()
+        if store:
+            msg_log = MessageLog(
+                store_id=store.id,
+                text=body,
+                direction="outbound",
+            )
+            db.add(msg_log)
+            db.commit()
+    except Exception as e:
+        logger.error("Failed to log outgoing message: %s", e)
+    finally:
+        db.close()
 
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:

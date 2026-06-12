@@ -27,7 +27,7 @@ def get_or_create_sku(
 
     Args:
         db:        SQLAlchemy session
-        store_id:  UUID of the store
+        store_id:  ID of the store
         sku_name:  SKU name as parsed from the user message
         unit:      Unit of measurement (bags, packets, kg, etc.)
 
@@ -56,7 +56,7 @@ def get_or_create_sku(
         unit=unit or "units",
     )
     db.add(new_sku)
-    db.flush()  # Assign sku_id without committing
+    db.flush()  # Assign id without committing
     logger.info("Created new SKU '%s' for store %s", normalised, store_id)
     return new_sku
 
@@ -76,7 +76,7 @@ def persist_sales(
 
     Args:
         db:            SQLAlchemy session
-        store_id:      UUID of the store
+        store_id:      ID of the store
         parsed_items:  Output from nlp_parser (confirmed by user)
         source:        Input source — "text", "ocr", or "voice"
 

@@ -9,7 +9,6 @@ import uuid
 from datetime import datetime, date as date_type
 
 from sqlalchemy import Column, Integer, Float, String, Boolean, Date, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 
 from app.database import Base
 
@@ -17,15 +16,15 @@ from app.database import Base
 class Forecast(Base):
     __tablename__ = "forecasts"
 
-    forecast_id = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
+    id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True
     )
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("stores.id"), nullable=False, index=True
+        Integer, ForeignKey("stores.id"), nullable=False, index=True
     )
     week_start = Column(Date, nullable=False)
     sku_id = Column(
-        UUID(as_uuid=True), ForeignKey("skus.sku_id"), nullable=False, index=True
+        Integer, ForeignKey("skus.id"), nullable=False, index=True
     )
     predicted_qty = Column(Float, nullable=False)
     confidence = Column(
@@ -40,17 +39,17 @@ class Forecast(Base):
 class ReorderSuggestion(Base):
     __tablename__ = "reorder_suggestions"
 
-    suggestion_id = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
+    id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True
     )
     forecast_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("forecasts.forecast_id"),
+        Integer,
+        ForeignKey("forecasts.id"),
         nullable=False,
         index=True,
     )
     sku_id = Column(
-        UUID(as_uuid=True), ForeignKey("skus.sku_id"), nullable=False, index=True
+        Integer, ForeignKey("skus.id"), nullable=False, index=True
     )
     suggested_qty = Column(Integer, nullable=False)
     confirmed = Column(Boolean, default=False)

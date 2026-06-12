@@ -15,7 +15,7 @@ from datetime import date, timedelta
 from typing import Optional, Dict, List
 
 import pandas as pd
-from prophet import Prophet
+from neuralprophet import NeuralProphet
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -40,7 +40,43 @@ def _fetch_daily_sales(
     """
     Pull aggregated daily sales for a single store+sku from the last N days.
 
-    return created
+    Returns a DataFrame with columns ['ds', 'y'] suitable for Prophet,
+    where 'ds' is the date and 'y' is total quantity sold that day.
+    """
+    cutoff = date.today() - timedelta(days=lookback_days)
+
+    rows = (
+        db.query(
+            SalesLog.date.label("ds"),
+            func.sum(SalesLog.quantity_sold).label("y"),
+        )
+        .filter(
+            SalesLog.store_id == store_id,
+            SalesLog.sku_id == sku_id,
+            SalesLog.date >= cutoff,
+        )
+        .group_by(SalesLog.date)
+        .order_by(SalesLog.date)
+        .all()
+    )
+
+    if not rows:
+        return pd.DataFrame(columns=["ds", "y"])
+
+    df = pd.DataFrame(rows, columns=["ds", "y"])
+    df["ds"] = pd.to_datetime(df["ds"])
+    df["y"] = df["y"].astype(float)
+    return df
+
+
+
+def generate_forecast(
+    db: Session,
+    store_id: int,
+    sku_id: int,
+    horizon_days: int = 7,
+) -> Optional[Dict]:
+    """
     Generate a 7-day demand forecast for a single store + SKU using Prophet.
 
     Args:
@@ -57,11 +93,10 @@ def _fetch_daily_sales(
         }
         or None if insufficient data (< 14 days).
     """
-    logger.info("Generating forecast for store=%s sku=%s", store_id, sku_id)
-    sales_df = _fetch_daily_sales(db, store_id, sku_id)
+    df = _fetch_daily_sales(db, store_id, sku_id)
 
     # Minimum data check (PRD: "Minimum 2 weeks of input data required")
-    unique_days = sales_df["ds"].nunique() if not sales_df.empty else 0
+    unique_days = df["ds"].nunique() if not df.empty else 0
     if unique_days < MIN_DAYS_FOR_FORECAST:
         logger.info(
             "Insufficient data for forecast: store=%s sku=%s days=%d (need %d)",
@@ -70,7 +105,7 @@ def _fetch_daily_sales(
         return None
 
     # Train Prophet on full dataset for the actual forecast
-    model = Prophet(
+    model = NeuralProphet(
         yearly_seasonality=False,
         weekly_seasonality=True,
         daily_seasonality=False,
@@ -82,24 +117,28 @@ def _fetch_daily_sales(
     except Exception as e:
         logger.warning("Could not add Indian holidays: %s", e)
 
-    model.fit(sales_df)
+    metrics = model.fit(df)
 
-    # Calculate confidence based on data quantity
-    days_of_data = len(sales_df)
-    if days_of_data >= MIN_DAYS_FOR_HIGH_CONFIDENCE:
+    # Calculate confidence based on NeuralProphet metrics
+    last_mae = metrics["MAE"].iloc[-1]
+    mean_actual = df["y"].mean()
+    mae_pct = last_mae / mean_actual if mean_actual > 0 else 1.0
+
+    days_of_data = len(df)
+    if days_of_data >= 21 and mae_pct < 0.25:
         confidence = "High"
-    elif days_of_data >= MIN_DAYS_FOR_FORECAST:
+    elif days_of_data >= 14 and mae_pct < 0.45:
         confidence = "Medium"
     else:
         confidence = "Low"
 
     # Generate future predictions
-    future = model.make_future_dataframe(periods=horizon_days)
+    future = model.make_future_dataframe(df=df, periods=horizon_days)
     forecast = model.predict(future)
 
     # Sum predicted demand for the next `horizon_days`
     future_preds = forecast.tail(horizon_days)
-    predicted_qty = max(0, int(round(future_preds["yhat"].sum())))
+    predicted_qty = max(0, int(round(future_preds["yhat1"].sum())))
 
     # Reorder quantity = ceil(predicted_qty × 1.2) — PRD P0.4 safety buffer
     reorder_qty = math.ceil(predicted_qty * 1.2)

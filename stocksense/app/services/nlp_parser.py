@@ -74,7 +74,7 @@ async def parse_sales_message(
             {
                 "sku_name": str,
                 "quantity": int,
-                "unit": str | None,
+                "unit": Optional[str],
                 "confidence": float,
                 "needs_confirmation": bool
             },
