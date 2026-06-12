@@ -15,10 +15,11 @@ from app.database import Base
 class Store(Base):
     __tablename__ = "stores"
 
-    store_id = Column(
+    id = Column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
     )
-    whatsapp_number = Column(String(20), unique=True, nullable=False, index=True)
+    whatsapp_number = Column(String(20), unique=True,
+                             nullable=False, index=True)
     name = Column(String(255), nullable=False)
     pin_code = Column(String(10), nullable=False)
     language = Column(String(10), nullable=False, default="en")  # en | hi | ta

@@ -21,7 +21,7 @@ class Forecast(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
     )
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False, index=True
+        UUID(as_uuid=True), ForeignKey("stores.id"), nullable=False, index=True
     )
     week_start = Column(Date, nullable=False)
     sku_id = Column(
