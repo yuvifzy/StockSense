@@ -40,52 +40,7 @@ def _fetch_daily_sales(
     """
     Pull aggregated daily sales for a single store+sku from the last N days.
 
-    Returns a DataFrame with columns ['ds', 'y'] suitable for Prophet,
-    where 'ds' is the date and 'y' is total quantity sold that day.
-    """
-    cutoff = date.today() - timedelta(days=lookback_days)
-
-    rows = (
-        db.query(
-            SalesLog.date.label("ds"),
-            func.sum(SalesLog.quantity_sold).label("y"),
-        )
-        .filter(
-            SalesLog.store_id == store_id,
-            SalesLog.sku_id == sku_id,
-            SalesLog.date >= cutoff,
-        )
-        .group_by(SalesLog.date)
-        .order_by(SalesLog.date)
-        .all()
-    )
-
-    if not rows:
-        return pd.DataFrame(columns=["ds", "y"])
-
-    df = pd.DataFrame(rows, columns=["ds", "y"])
-    df["ds"] = pd.to_datetime(df["ds"])
-    df["y"] = df["y"].astype(float)
-    return df
-
-
-def _calculate_confidence(mae_pct: float, days_of_data: int) -> str:
-    """Convert MAE percentage and data length into a confidence label."""
-    if days_of_data >= MIN_DAYS_FOR_HIGH_CONFIDENCE and mae_pct < 0.25:
-        return "High"
-    if days_of_data >= MIN_DAYS_FOR_FORECAST and mae_pct < 0.45:
-        return "Medium"
-    return "Low"
-
-
-
-def generate_forecast(
-    db: Session,
-    store_id: int,
-    sku_id: int,
-    horizon_days: int = 7,
-) -> Optional[Dict]:
-    """
+    return created
     Generate a 7-day demand forecast for a single store + SKU using Prophet.
 
     Args:
@@ -286,50 +241,4 @@ def persist_forecast_to_db(
         "Persisted %d forecasts for store %s (week %s)",
         len(created), store_id, week_start,
     )
-    return created"""
-Forecaster Service
-Generates weekly demand forecasts using Facebook Prophet.
-
-No AI logic wired yet — this is a structural placeholder.
-"""
-
-from datetime import date
-from typing import List, Dict
-
-
-async def generate_weekly_forecast(store_id: str, week_start: date) -> list[dict]:
-    """
-    Generate a 7-day SKU-level demand forecast for a store.
-
-    Args:
-        store_id: UUID of the store
-        week_start: Monday date for the forecast week
-
-    Returns:
-        List of forecast dicts:
-        [{"sku_id": str, "predicted_qty": float, "confidence": str}, ...]
-    """
-    # TODO: Query sales_logs for this store (min 14 days of data)
-    # TODO: Run Prophet per-SKU time series
-    # TODO: Apply 1.2x safety buffer for reorder quantities
-    # TODO: Store results in forecasts + reorder_suggestions tables
-    return []
-
-
-async def get_latest_forecast(store_id: str) -> dict:
-    """
-    Retrieve the most recent forecast for a store.
-
-    Args:
-        store_id: UUID of the store
-
-    Returns:
-        Dict with forecast data and reorder recommendations
-    """
-    # TODO: Query forecasts table for latest week_start
-    return {"store_id": store_id, "forecasts": [], "reorder_suggestions": []}
-
-
-def get_deadstock_skus(db, store_id: int, days: int = 14) -> List[Dict]:
-    """Return an empty deadstock list for the API scaffold."""
-    return []
+    return created

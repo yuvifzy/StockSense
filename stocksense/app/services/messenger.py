@@ -20,6 +20,22 @@ GRAPH_API_URL = (
     f"https://graph.facebook.com/v18.0/{settings.WHATSAPP_PHONE_ID}/messages"
 )
 
+
+def _has_real_whatsapp_credentials() -> bool:
+    """Return True only when the WhatsApp credentials look production-ready."""
+    if not settings.WHATSAPP_TOKEN or not settings.WHATSAPP_PHONE_ID:
+        return False
+
+    placeholder_values = {"test_token", "test_phone_id"}
+    if (
+        settings.WHATSAPP_TOKEN in placeholder_values
+        or settings.WHATSAPP_PHONE_ID in placeholder_values
+    ):
+        return False
+
+    return True
+
+
 # ── Multi-language message templates (PRD §7 user flow) ──
 MESSAGES = {
     # ── Onboarding: Language selection (Step 2) ──
@@ -118,7 +134,8 @@ def get_message(key: str, language: str = "hi", **kwargs) -> str:
     Falls back to Hindi, then English if the key/language is missing.
     """
     templates = MESSAGES.get(key, {})
-    text = templates.get(language) or templates.get("hi") or templates.get("en", "")
+    text = templates.get(language) or templates.get(
+        "hi") or templates.get("en", "")
     if kwargs:
         text = text.format(**kwargs)
     return text
@@ -135,8 +152,13 @@ async def send_text(to: str, body: str) -> dict:
     Returns:
         Meta API response dict, or error dict on failure.
     """
-    if not settings.WHATSAPP_TOKEN or not settings.WHATSAPP_PHONE_ID:
-        logger.warning("WhatsApp credentials not configured — message not sent to %s", to)
+    if not _has_real_whatsapp_credentials():
+        logger.warning(
+            "WhatsApp credentials not configured for local dev — message not sent to %s. Mock send: %s",
+            to,
+            body,
+        )
+        print(f"[WhatsApp mock send to {to}] {body}")
         return {"status": "skipped", "reason": "credentials_not_configured"}
 
     headers = {
@@ -155,10 +177,12 @@ async def send_text(to: str, body: str) -> dict:
             resp = await client.post(GRAPH_API_URL, headers=headers, json=payload)
             resp.raise_for_status()
             data = resp.json()
-            logger.info("Message sent to %s (id=%s)", to, data.get("messages", [{}])[0].get("id"))
+            logger.info("Message sent to %s (id=%s)", to,
+                        data.get("messages", [{}])[0].get("id"))
             return data
     except httpx.HTTPStatusError as e:
-        logger.error("WhatsApp API HTTP error %s: %s", e.response.status_code, e.response.text)
+        logger.error("WhatsApp API HTTP error %s: %s",
+                     e.response.status_code, e.response.text)
         return {"status": "error", "code": e.response.status_code, "detail": e.response.text}
     except Exception as e:
         logger.error("WhatsApp send failed: %s", e, exc_info=True)
