@@ -15,7 +15,7 @@ from datetime import date, timedelta
 from typing import Optional, Dict, List
 
 import pandas as pd
-from neuralprophet import NeuralProphet
+from prophet import Prophet
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -70,7 +70,7 @@ def _fetch_daily_sales(
         return None
 
     # Train Prophet on full dataset for the actual forecast
-    model = NeuralProphet(
+    model = Prophet(
         yearly_seasonality=False,
         weekly_seasonality=True,
         daily_seasonality=False,
@@ -82,23 +82,24 @@ def _fetch_daily_sales(
     except Exception as e:
         logger.warning("Could not add Indian holidays: %s", e)
 
-    metrics = model.fit(sales_df)
+    model.fit(sales_df)
 
-    # Calculate confidence based on NeuralProphet metrics
-    last_mae = metrics["MAE"].iloc[-1]
-    mean_actual = sales_df["y"].mean()
-    mae_pct = last_mae / mean_actual if mean_actual > 0 else 1.0
-
+    # Calculate confidence based on data quantity
     days_of_data = len(sales_df)
-    confidence = _calculate_confidence(mae_pct, days_of_data)
+    if days_of_data >= MIN_DAYS_FOR_HIGH_CONFIDENCE:
+        confidence = "High"
+    elif days_of_data >= MIN_DAYS_FOR_FORECAST:
+        confidence = "Medium"
+    else:
+        confidence = "Low"
 
     # Generate future predictions
-    future = model.make_future_dataframe(df=sales_df, periods=horizon_days)
+    future = model.make_future_dataframe(periods=horizon_days)
     forecast = model.predict(future)
 
     # Sum predicted demand for the next `horizon_days`
     future_preds = forecast.tail(horizon_days)
-    predicted_qty = max(0, int(round(future_preds["yhat1"].sum())))
+    predicted_qty = max(0, int(round(future_preds["yhat"].sum())))
 
     # Reorder quantity = ceil(predicted_qty × 1.2) — PRD P0.4 safety buffer
     reorder_qty = math.ceil(predicted_qty * 1.2)
