@@ -9,3 +9,4 @@ lightning_logs/
 *.ckpt
 test_output.txt
 .env
+stocksense/.env
