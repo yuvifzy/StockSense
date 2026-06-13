@@ -18,6 +18,7 @@ PRD references: P0.3, P1.1, §7 (forecast message format), §8 (Celery Beat)
 
 import asyncio
 import logging
+import os
 from datetime import date, timedelta
 from typing import List, Dict
 
@@ -38,10 +39,14 @@ from app.services.messenger import send_text
 logger = logging.getLogger(__name__)
 
 # ── Celery app config ──
+# Read REDIS_URL directly from env at module-load time (not via Settings class)
+_redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+logger.info("Celery broker/backend: %s", _redis_url[:30] + "...")
+
 celery_app = Celery(
     "stocksense",
-    broker=settings.REDIS_URL,
-    backend=settings.REDIS_URL,
+    broker=_redis_url,
+    backend=_redis_url,
 )
 
 celery_app.conf.timezone = "Asia/Kolkata"
