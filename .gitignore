@@ -8,3 +8,4 @@ venv/
 lightning_logs/
 *.ckpt
 test_output.txt
+.env
