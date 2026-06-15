@@ -1,7 +1,6 @@
 # StockSense 🛒📈
 
 [![Status](https://img.shields.io/badge/Status-MVP-blue.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
 > **Smart stock suggestions and demand forecasting for Indian Kirana stores—powered by AI, delivered via WhatsApp.**
 
@@ -98,10 +97,6 @@ Contributions are what make the open-source community such an amazing place to l
 5. Open a Pull Request
 
 ---
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
