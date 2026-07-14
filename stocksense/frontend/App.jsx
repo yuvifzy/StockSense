@@ -489,9 +489,9 @@ function SKUChart({ dark, chartData, seriesLabels, loading }) {
             <YAxis tick={{ fontSize: 11, fill: dark ? "#5A6070" : "#9CA3AF" }} axisLine={false} tickLine={false} width={22} />
             <Tooltip content={tip} cursor={{ fill: dark ? "rgba(255,255,255,.04)" : "#F9FAFB", radius: 6 }} />
             <Legend formatter={v => <span style={{ fontSize: 11, color: dark ? "#8B92A8" : "#6B7280", fontWeight: 700 }}>{v}</span>} iconType="circle" iconSize={7} />
-            <Bar dataKey="sku1" name={seriesLabels[0]} fill="#16A34A" radius={[5, 5, 0, 0]} />
-            <Bar dataKey="sku2" name={seriesLabels[1]} fill="#3B82F6" radius={[5, 5, 0, 0]} />
-            <Bar dataKey="sku3" name={seriesLabels[2]} fill="#F59E0B" radius={[5, 5, 0, 0]} />
+            <Bar dataKey="sku1" name={seriesLabels[0] || "SKU 1"} fill="#16A34A" radius={[5, 5, 0, 0]} />
+            <Bar dataKey="sku2" name={seriesLabels[1] || "SKU 2"} fill="#3B82F6" radius={[5, 5, 0, 0]} />
+            <Bar dataKey="sku3" name={seriesLabels[2] || "SKU 3"} fill="#F59E0B" radius={[5, 5, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -598,7 +598,7 @@ function InventoryTable({ dark, items, categories, loading }) {
   const rows = useMemo(() => {
     let r = items;
     if (category !== "All") r = r.filter(x => x.category === category);
-    if (search) r = r.filter(x => x.product.toLowerCase().includes(search.toLowerCase()));
+    if (search) r = r.filter(x => (x.product || "").toLowerCase().includes(search.toLowerCase()));
     return [...r].sort((a, b) => {
       let av = a[sortKey], bv = b[sortKey];
       if (typeof av === "string") { av = av.toLowerCase(); bv = bv.toLowerCase(); }

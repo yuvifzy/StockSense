@@ -2,7 +2,7 @@
 Tests for forecaster.py — TASK 5
 
 Seed 21 days of synthetic sales data for 3 SKUs into a test SQLite DB.
-Assert Prophet returns non-null forecast with confidence = High for all 3.
+Assert NeuralProphet returns non-null forecast with confidence = High for all 3.
 Assert reorder_qty = ceil(predicted_qty × 1.2).
 
 Note: SQLite doesn't support PostgreSQL ARRAY type, so we override

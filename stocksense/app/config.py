@@ -5,7 +5,7 @@ App configuration — loads environment variables with pydantic-settings.
 import os
 from dotenv import load_dotenv
 
-load_dotenv(override=False)
+load_dotenv(override=True)
 
 
 class Settings:

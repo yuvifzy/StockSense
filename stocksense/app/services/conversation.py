@@ -9,11 +9,12 @@ and stores pending parsed items for confirmation.
 
 import json
 import logging
-import os
 from enum import Enum
 from typing import Optional
 
 import redis.asyncio as aioredis
+
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,12 @@ class ConversationState(str, Enum):
 
 
 async def get_redis() -> aioredis.Redis:
-    """Lazy-init async Redis connection — reads REDIS_URL from env at call time."""
+    """Lazy-init async Redis connection using centralised settings."""
     global _redis
     if _redis is None:
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-        logger.info("Connecting to Redis: %s", redis_url[:30] + "...")
+        logger.info("Connecting to Redis: %s", settings.REDIS_URL[:30] + "...")
         _redis = aioredis.from_url(
-            redis_url, decode_responses=True
+            settings.REDIS_URL, decode_responses=True
         )
     return _redis
 

@@ -22,9 +22,10 @@ google-genai>=0.8.0
 
 # Forecasting
 neuralprophet>=0.8.0
+torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
 holidays>=0.40
 pandas>=1.5.0
-numpy>=1.24.0,<2.0.0
+numpy==1.26.4
 
 # Utilities
 python-dotenv==1.0.1
